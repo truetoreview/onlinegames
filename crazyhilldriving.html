@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hill Climb Racing</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    #game-ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+      font-size: 20px;
+    }
+    #restart-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      display: none;
+    }
+    #controls {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 50px;
+      box-sizing: border-box;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .control-btn {
+      width: 80px;
+      height: 80px;
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      user-select: none;
+      touch-action: manipulation;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <div id="game-ui">
+    <div>Distance: <span id="distance">0</span>m</div>
+    <div>Fuel: <span id="fuel">100</span>%</div>
+    <div>Coins: <span id="coins">0</span></div>
+  </div>
+  <button id="restart-btn">Restart Game</button>
+  <div id="controls">
+    <div class="control-btn" id="left-btn">←</div>
+    <div class="control-btn" id="right-btn">→</div>
+  </div>
+
+  <script>
+    // Game variables
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const distanceDisplay = document.getElementById('distance');
+    const fuelDisplay = document.getElementById('fuel');
+    const coinsDisplay = document.getElementById('coins');
+    const restartBtn = document.getElementById('restart-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+
+    // Set canvas dimensions
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Game state
+    let gameRunning = true;
+    let distance = 0;
+    let fuel = 100;
+    let coins = 0;
+    let cameraPosX = 0;
+    let cameraPosY = 0;
+
+    // Terrain generation
+    const terrainPoints = [];
+    const terrainSegmentWidth = 50;
+    const terrainWidth = 500;  
+    const coinPositions = [];
+    const fuelCans = [];
+
+    // Vehicle properties
+    const car = {
+      x: 200,
+      y: 0,
+      width: 60,
+      height: 30,
+      wheelRadius: 15,
+      wheelBase: 40,
+      frontWheel: { x: 0, y: 0 },
+      rearWheel: { x: 0, y: 0 },
+      rotation: 0,
+      speed: 0,
+      maxSpeed: 8,
+      acceleration: 0.2,
+      gravity: 0.5,
+      isAccelerating: false,
+      isBraking: false
+    };
+
+    // Initialize terrain
+    function initTerrain() {
+      terrainPoints.length = 0;
+      coinPositions.length = 0;
+      fuelCans.length = 0;
+      
+      // Create initial flat ground
+      for (let i = 0; i < 10; i++) {
+        terrainPoints.push({ x: i * terrainSegmentWidth, y: canvas.height - 100 });
+      }
+      
+      // Generate the rest of the terrain with hills
+      for (let i = 10; i < terrainWidth; i++) {
+        const lastPoint = terrainPoints[i - 1];
+        const height = lastPoint.y + (Math.random() * 60 - 30);
+        const clampedHeight = Math.min(Math.max(height, canvas.height - 400), canvas.height - 50);
+        terrainPoints.push({ x: i * terrainSegmentWidth, y: clampedHeight });
+        
+        // Add coins with some probability - positioned closer to terrain
+        if (Math.random() < 0.15) {
+          coinPositions.push({ 
+            x: i * terrainSegmentWidth, 
+            y: clampedHeight - 30 - Math.random() * 20, // Lower height
+            collected: false
+          });
+        }
+        
+        // Add fuel cans with less probability
+        if (Math.random() < 0.05) {
+          fuelCans.push({
+            x: i * terrainSegmentWidth,
+            y: clampedHeight - 25,
+            collected: false
+          });
+        }
+      }
+    }
+
+    // Reset game
+    function resetGame() {
+      car.x = 200;
+      car.y = 0;
+      car.speed = 0;
+      car.rotation = 0;
+      distance = 0;
+      fuel = 100;
+      coins = 0;
+      gameRunning = true;
+      cameraPosX = 0;
+      cameraPosY = 0;
+      
+      initTerrain();
+      
+      restartBtn.style.display = 'none';
+      
+      // Update UI
+      updateUI();
+      
+      // Start game loop
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Update UI
+    function updateUI() {
+      distanceDisplay.textContent = Math.floor(distance);
+      fuelDisplay.textContent = Math.floor(fuel);
+      coinsDisplay.textContent = coins;
+    }
+
+    // Find y-coordinate on terrain for a given x-coordinate
+    function getTerrainYAt(x) {
+      const segmentIndex = Math.floor(x / terrainSegmentWidth);
+      
+      if (segmentIndex < 0) return terrainPoints[0].y;
+      if (segmentIndex >= terrainPoints.length - 1) return terrainPoints[terrainPoints.length - 1].y;
+      
+      const start = terrainPoints[segmentIndex];
+      const end = terrainPoints[segmentIndex + 1];
+      const ratio = (x - start.x) / terrainSegmentWidth;
+      
+      return start.y + (end.y - start.y) * ratio;
+    }
+
+    // Check if vehicle has crashed
+    function checkCrash() {
+      // Check if car is upside down
+      if (Math.abs(car.rotation) > Math.PI * 0.7) {
+        return true;
+      }
+      
+      return false;
+    }
+
+    // Handle collisions with coins
+    function checkCoinCollisions() {
+      // Check coin collisions
+      for (const coin of coinPositions) {
+        if (!coin.collected) {
+          const dx = car.x + car.width / 2 - coin.x;
+          const dy = car.y + car.height / 2 - coin.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 40) {
+            coin.collected = true;
+            coins++;
+            updateUI();
+          }
+        }
+      }
+      
+      // Check fuel can collisions
+      for (const fuelCan of fuelCans) {
+        if (!fuelCan.collected) {
+          const dx = car.x + car.width / 2 - fuelCan.x;
+          const dy = car.y + car.height / 2 - fuelCan.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 40) {
+            fuelCan.collected = true;
+            fuel = Math.min(100, fuel + 25); // Add 25% fuel, max 100%
+            updateUI();
+          }
+        }
+      }
+    }
+    
+    // Update vehicle physics
+    function updateVehicle() {
+      if (!gameRunning) return;
+      
+      // Apply controls
+      if (car.isAccelerating && fuel > 0) {
+        car.speed += car.acceleration;
+        fuel -= 0.1;
+      } else if (car.isBraking) {
+        car.speed -= car.acceleration * 1.5;
+      }
+      
+      // Limit speed
+      car.speed = Math.max(-car.maxSpeed / 2, Math.min(car.speed, car.maxSpeed));
+      
+      // Apply gravity
+      const frontWheelY = getTerrainYAt(car.x + car.wheelBase);
+      const rearWheelY = getTerrainYAt(car.x);
+      
+      // Determine wheel positions
+      car.frontWheel = { x: car.x + car.wheelBase, y: frontWheelY };
+      car.rearWheel = { x: car.x, y: rearWheelY };
+      
+      // Calculate car angle based on wheel positions
+      car.rotation = Math.atan2(frontWheelY - rearWheelY, car.wheelBase);
+      
+      // Update car position
+      car.x += car.speed * Math.cos(car.rotation);
+      car.y = (frontWheelY + rearWheelY) / 2 - car.height / 2;
+      
+      // Natural deceleration
+      car.speed *= 0.98;
+      
+      // Calculate distance traveled
+      distance = car.x / 100;
+      
+      // Update camera position for scrolling
+      cameraPosX = car.x - canvas.width / 3;
+      cameraPosY = car.y - canvas.height / 2;
+      
+      // Keep camera from showing too much of the sky
+      cameraPosY = Math.max(0, Math.min(cameraPosY, canvas.height / 2));
+      
+      // Generate more terrain if needed
+      if (car.x > (terrainPoints.length - 20) * terrainSegmentWidth) {
+        extendTerrain();
+      }
+      
+      // Check for collisions with coins and fuel
+      checkCoinCollisions();
+      
+      // Check if game over
+      if (checkCrash() || fuel <= 0) {
+        gameRunning = false;
+        restartBtn.style.display = 'block';
+      }
+      
+      updateUI();
+    }
+    
+    // Extend terrain as player moves forward
+    function extendTerrain() {
+      const lastX = terrainPoints[terrainPoints.length - 1].x;
+      const lastY = terrainPoints[terrainPoints.length - 1].y;
+      
+      for (let i = 0; i < 20; i++) {
+        const newX = lastX + (i + 1) * terrainSegmentWidth;
+        const newY = lastY + (Math.random() * 60 - 30);
+        const clampedY = Math.min(Math.max(newY, canvas.height - 400), canvas.height - 50);
+        
+        terrainPoints.push({ x: newX, y: clampedY });
+        
+        // Add coins with some probability
+        if (Math.random() < 0.15) {
+          coinPositions.push({ 
+            x: newX, 
+            y: clampedY - 30 - Math.random() * 20,
+            collected: false
+          });
+        }
+        
+        // Add fuel cans with less probability
+        if (Math.random() < 0.05) {
+          fuelCans.push({
+            x: newX,
+            y: clampedY - 25,
+            collected: false
+          });
+        }
+      }
+    }
+
+    // Render game
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Set camera transform
+      ctx.save();
+      ctx.translate(-cameraPosX, -cameraPosY);
+      
+      // Draw sky - already handled by body background
+      
+      // Draw mountains in background
+      drawMountains();
+      
+      // Draw terrain
+      ctx.beginPath();
+      ctx.moveTo(terrainPoints[0].x, terrainPoints[0].y);
+      
+      for (let i = 1; i < terrainPoints.length; i++) {
+        ctx.lineTo(terrainPoints[i].x, terrainPoints[i].y);
+      }
+      
+      ctx.lineTo(terrainPoints[terrainPoints.length - 1].x, canvas.height + cameraPosY);
+      ctx.lineTo(terrainPoints[0].x, canvas.height + cameraPosY);
+      ctx.closePath();
+      
+      ctx.fillStyle = '#8B4513';
+      ctx.fill();
+      
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#663300';
+      ctx.stroke();
+      
+      // Draw grass
+      ctx.beginPath();
+      ctx.moveTo(terrainPoints[0].x, terrainPoints[0].y);
+      
+      for (let i = 1; i < terrainPoints.length; i++) {
+        ctx.lineTo(terrainPoints[i].x, terrainPoints[i].y);
+      }
+      
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#4CAF50';
+      ctx.stroke();
+      
+      // Draw coins
+      for (const coin of coinPositions) {
+        if (!coin.collected) {
+          ctx.beginPath();
+          ctx.arc(coin.x, coin.y, 15, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFD700';
+          ctx.fill();
+          ctx.strokeStyle = '#B8860B';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          
+          // Draw $ symbol
+          ctx.fillStyle = '#B8860B';
+          ctx.font = '16px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('$', coin.x, coin.y);
+        }
+      }
+      
+      // Draw fuel cans
+      for (const fuelCan of fuelCans) {
+        if (!fuelCan.collected) {
+          // Draw fuel can body
+          ctx.fillStyle = '#FF0000';
+          ctx.fillRect(fuelCan.x - 10, fuelCan.y - 20, 20, 25);
+          
+          // Draw fuel can top
+          ctx.fillStyle = '#CCCCCC';
+          ctx.fillRect(fuelCan.x - 5, fuelCan.y - 25, 10, 5);
+          
+          // Draw fuel can spout
+          ctx.fillStyle = '#CCCCCC';
+          ctx.fillRect(fuelCan.x + 5, fuelCan.y - 15, 8, 8);
+        }
+      }
+      
+      // Draw car
+      ctx.save();
+      ctx.translate(car.x + car.width / 2, car.y + car.height / 2);
+      ctx.rotate(car.rotation);
+      
+      // Car body
+      ctx.fillStyle = '#FF5722';
+      ctx.fillRect(-car.width / 2, -car.height / 2, car.width, car.height);
+      
+      // Car details
+      ctx.fillStyle = '#3F51B5';
+      ctx.fillRect(-car.width / 2 + car.width * 0.7, -car.height / 2, car.width * 0.3, car.height * 0.5);
+      
+      ctx.restore();
+      
+      // Draw wheels
+      ctx.fillStyle = '#333';
+      ctx.beginPath();
+      ctx.arc(car.rearWheel.x, car.rearWheel.y, car.wheelRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(car.frontWheel.x, car.frontWheel.y, car.wheelRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Restore original transform
+      ctx.restore();
+      
+      // Game over message
+      if (!gameRunning) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, canvas.height / 2 - 50, canvas.width, 100);
+        ctx.fillStyle = 'white';
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(fuel <= 0 ? 'Out of fuel!' : 'Crashed!', canvas.width / 2, canvas.height / 2);
+      }
+    }
+    
+    // Draw background mountains
+    function drawMountains() {
+      ctx.fillStyle = '#9C7B61';
+      
+      // First mountain range (far)
+      ctx.beginPath();
+      ctx.moveTo(cameraPosX, canvas.height - 150 + cameraPosY);
+      
+      for (let x = 0; x < canvas.width; x += 50) {
+        const xPos = cameraPosX + x;
+        const yPos = canvas.height - 150 + Math.sin(xPos * 0.01) * 50 + cameraPosY;
+        ctx.lineTo(xPos, yPos);
+      }
+      
+      ctx.lineTo(cameraPosX + canvas.width, canvas.height + cameraPosY);
+      ctx.lineTo(cameraPosX, canvas.height + cameraPosY);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Second mountain range (closer)
+      ctx.fillStyle = '#7D623C';
+      ctx.beginPath();
+      ctx.moveTo(cameraPosX, canvas.height - 100 + cameraPosY);
+      
+      for (let x = 0; x < canvas.width; x += 30) {
+        const xPos = cameraPosX + x;
+        const yPos = canvas.height - 100 + Math.sin(xPos * 0.02 + 1) * 60 + cameraPosY;
+        ctx.lineTo(xPos, yPos);
+      }
+      
+      ctx.lineTo(cameraPosX + canvas.width, canvas.height + cameraPosY);
+      ctx.lineTo(cameraPosX, canvas.height + cameraPosY);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Game loop
+    function gameLoop() {
+      updateVehicle();
+      render();
+      
+      if (gameRunning) {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    // Event listeners
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // Keyboard controls
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        car.isAccelerating = true;
+      } else if (e.key === 'ArrowLeft') {
+        car.isBraking = true;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowRight') {
+        car.isAccelerating = false;
+      } else if (e.key === 'ArrowLeft') {
+        car.isBraking = false;
+      }
+    });
+
+    // Touch controls
+    leftBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      car.isBraking = true;
+    });
+
+    leftBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      car.isBraking = false;
+    });
+
+    rightBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      car.isAccelerating = true;
+    });
+
+    rightBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      car.isAccelerating = false;
+    });
+
+    // Mouse controls
+    leftBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      car.isBraking = true;
+    });
+
+    leftBtn.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      car.isBraking = false;
+    });
+
+    leftBtn.addEventListener('mouseleave', (e) => {
+      e.preventDefault();
+      car.isBraking = false;
+    });
+
+    rightBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      car.isAccelerating = true;
+    });
+
+    rightBtn.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      car.isAccelerating = false;
+    });
+
+    rightBtn.addEventListener('mouseleave', (e) => {
+      e.preventDefault();
+      car.isAccelerating = false;
+    });
+
+    // Restart button
+    restartBtn.addEventListener('click', resetGame);
+
+    // Initialize and start game
+    initTerrain();
+    resetGame();
+  </script>
+</body>
+</html>
