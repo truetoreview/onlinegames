@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click-to-Shoot Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    canvas {
+      border: 2px solid black;
+      background-color: #87ceeb;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const player = {
+      x: canvas.width / 2,
+      y: canvas.height - 50,
+      width: 50,
+      height: 50,
+      color: "red",
+      speed: 5
+    };
+
+    const bullets = [];
+    const bulletSpeed = 5;
+
+    // Draw player
+    function drawPlayer() {
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    // Draw bullets
+    function drawBullets() {
+      bullets.forEach((bullet, index) => {
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(bullet.x, bullet.y, 10, 20);
+
+        // Move bullets
+        bullet.y -= bulletSpeed;
+
+        // Remove bullet if it goes out of bounds
+        if (bullet.y < 0) {
+          bullets.splice(index, 1);
+        }
+      });
+    }
+
+    // Handle player movement
+    function movePlayer() {
+      if (leftPressed && player.x > 0) {
+        player.x -= player.speed;
+      }
+      if (rightPressed && player.x < canvas.width - player.width) {
+        player.x += player.speed;
+      }
+    }
+
+    // Handle shooting
+    function shootBullet(event) {
+      bullets.push({ x: player.x + player.width / 2 - 5, y: player.y });
+    }
+
+    // Keyboard input
+    let leftPressed = false;
+    let rightPressed = false;
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") leftPressed = true;
+      if (event.key === "ArrowRight") rightPressed = true;
+    });
+
+    window.addEventListener("keyup", (event) => {
+      if (event.key === "ArrowLeft") leftPressed = false;
+      if (event.key === "ArrowRight") rightPressed = false;
+    });
+
+    window.addEventListener("click", shootBullet);
+
+    // Main game loop
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+      movePlayer();
+      drawPlayer();
+      drawBullets();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop(); // Start the game
+  </script>
+
+</body></html>
