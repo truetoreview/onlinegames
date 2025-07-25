@@ -3,250 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Games - Play Free Games Online</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Online Games - Your Gaming Hub</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Custom Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #121212; /* A very dark gray, almost black */
-            color: #E0E0E0; /* Light gray for text */
+            background-color: #1a202c; /* Dark background for a gaming feel */
+            color: #e2e8f0; /* Light text for contrast */
         }
-        .hero-section {
-            background-image: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 1)), url('https://placehold.co/1920x1080/1a202c/ffffff?text=Epic+Game+Montage');
-            background-size: cover;
-            background-position: center;
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .game-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background-color: #1E1E1E;
+        ::-webkit-scrollbar-track {
+            background: #2d3748;
+            border-radius: 10px;
         }
-        .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.15);
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 10px;
         }
-        .btn-primary {
-            background-color: #00FFFF; /* Cyan */
-            color: #121212;
-            font-weight: 700;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #00CCCC;
-            transform: scale(1.05);
-        }
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid #00FFFF;
-            color: #00FFFF;
-            font-weight: 600;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background-color: #00FFFF;
-            color: #121212;
-        }
-        .category-card {
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            border-color: #333;
-        }
-        .category-card:hover {
-             transform: scale(1.05);
-             border-color: #00FFFF;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
         }
     </style>
 </head>
 <body class="antialiased">
-
     <!-- Header -->
-    <header class="bg-black/80 backdrop-blur-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Site Title/Logo -->
-            <a href="#" class="text-2xl font-black text-white uppercase tracking-widest">
-                Online<span class="text-cyan-400">Games</span>
+    <header class="bg-gray-900 shadow-lg py-4 px-6 md:px-12">
+        <nav class="container mx-auto flex justify-between items-center flex-wrap">
+            <!-- Logo/Site Title -->
+            <a href="#" class="text-white text-3xl font-bold tracking-wider rounded-md p-2 hover:bg-gray-800 transition-colors duration-300">
+                Online Games
             </a>
-            <!-- Desktop Navigation -->
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">Home</a>
-                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">All Games</a>
-                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">Categories</a>
-                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">About</a>
+
+            <!-- Navigation Links (Hidden on small screens, shown on medium and up) -->
+            <div class="hidden md:flex space-x-8">
+                <a href="#online-games" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg font-medium rounded-md p-2">Play Online</a>
+                <a href="#downloadable-games" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg font-medium rounded-md p-2">Download Games</a>
+                <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg font-medium rounded-md p-2">About</a>
+                <a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300 text-lg font-medium rounded-md p-2">Contact</a>
             </div>
-            <!-- CTA Button -->
-            <a href="https://github.com/truetoreview/online-games" target="_blank" class="hidden md:block bg-gray-700 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
-                GitHub
-            </a>
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
+
+            <!-- Mobile Menu Button (Hamburger Icon) -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
         </nav>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4">
-            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">Home</a>
-            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">All Games</a>
-            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">Categories</a>
-            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">About</a>
-            <a href="https://github.com/truetoreview/online-games" target="_blank" class="block bg-gray-700 text-white mt-2 py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors text-center">
-                GitHub
-            </a>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 mt-4 rounded-lg shadow-md">
+            <nav class="flex flex-col space-y-2 p-4">
+                <a href="#online-games" class="block text-gray-300 hover:text-white transition-colors duration-300 text-base font-medium rounded-md py-2 px-3">Play Online</a>
+                <a href="#downloadable-games" class="block text-gray-300 hover:text-white transition-colors duration-300 text-base font-medium rounded-md py-2 px-3">Download Games</a>
+                <a href="#about" class="block text-gray-300 hover:text-white transition-colors duration-300 text-base font-medium rounded-md py-2 px-3">About</a>
+                <a href="#contact" class="block text-gray-300 hover:text-white transition-colors duration-300 text-base font-medium rounded-md py-2 px-3">Contact</a>
+            </nav>
         </div>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="hero-section h-[70vh] md:h-[80vh] flex items-center justify-center text-center">
-            <div class="container mx-auto px-6">
-                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white uppercase drop-shadow-lg">
-                    Your Ultimate Gaming Hub
+        <section class="relative bg-gradient-to-r from-purple-800 to-indigo-900 text-white py-20 md:py-32 flex items-center justify-center min-h-[500px] overflow-hidden rounded-b-xl shadow-2xl">
+            <!-- Background Image Overlay (Royalty-free gaming abstract image) -->
+            <img src="https://placehold.co/1920x800/2a0050/ffffff?text=Immersive+Gaming+Experience" alt="Abstract gaming background" class="absolute inset-0 w-full h-full object-cover opacity-30">
+            <div class="relative z-10 text-center max-w-4xl px-4">
+                <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 animate-pulse-slow">
+                    Dive into the Fun!
                 </h1>
-                <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-3xl mx-auto drop-shadow-md">
-                    Discover and play thousands of free online games. No downloads, just instant fun.
+                <p class="text-xl md:text-2xl mb-8 opacity-90">
+                    Explore a universe of exciting online and downloadable games. Your next adventure awaits!
                 </p>
-                <div class="mt-8">
-                    <a href="#featured-games" class="btn-primary py-3 px-8 rounded-full text-lg uppercase">
-                        Play Now
-                    </a>
+                <a href="#online-games" class="inline-block bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl">
+                    Start Playing Now!
+                </a>
+            </div>
+        </section>
+
+        <!-- Online Games Section -->
+        <section id="online-games" class="container mx-auto py-16 px-4 md:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-blue-400">Play Online Instantly</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Game Card 1 -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/3182CE/ffffff?text=Action+Adventure" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Pixel Quest</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">An epic 2D adventure game where you explore ancient ruins and battle mythical creatures.</p>
+                        <a href="#" class="block w-full text-center bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition-colors duration-300 transform hover:scale-105">Play Now</a>
+                    </div>
+                </div>
+
+                <!-- Game Card 2 -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/d53f8c/ffffff?text=Puzzle+Game" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Mind Bender</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">Challenge your brain with intricate puzzles and logic riddles in this captivating game.</p>
+                        <a href="#" class="block w-full text-center bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition-colors duration-300 transform hover:scale-105">Play Now</a>
+                    </div>
+                </div>
+
+                <!-- Game Card 3 -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/38a169/ffffff?text=Strategy+Game" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Galactic Empire</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">Build your space empire, manage resources, and conquer galaxies in this real-time strategy game.</p>
+                        <a href="#" class="block w-full text-center bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition-colors duration-300 transform hover:scale-105">Play Now</a>
+                    </div>
+                </div>
+
+                <!-- Game Card 4 -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/ecc94b/ffffff?text=Arcade+Fun" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Retro Runner</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">A classic arcade-style endless runner with vibrant pixel art and challenging obstacles.</p>
+                        <a href="#" class="block w-full text-center bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition-colors duration-300 transform hover:scale-105">Play Now</a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Featured Games Section -->
-        <section id="featured-games" class="py-16 sm:py-24 bg-[#181818]">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">
-                    <span class="text-cyan-400">Featured</span> Games
-                </h2>
-                <!-- Games Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    
-                    <!-- Game Card 1 -->
-                    <!-- To add your game, change the image src and the links -->
-                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
-                        <img src="https://placehold.co/400x300/3498db/ffffff?text=Space+Shooter" alt="Game 1" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-white mb-2">Space Shooter X</h3>
-                            <p class="text-gray-400 text-sm mb-4">Action | Sci-Fi</p>
-                            <div class="flex space-x-4">
-                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
-                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm">Download</a>
-                            </div>
-                        </div>
+        <!-- Downloadable Games Section -->
+        <section id="downloadable-games" class="container mx-auto py-16 px-4 md:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12 text-purple-400">Download and Play Offline</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Game Card 1 (Download) -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/9f7aea/ffffff?text=FPS+Tactics" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Combat Zone</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">Experience intense first-person shooter action with realistic graphics and competitive multiplayer.</p>
+                        <a href="#" class="block w-full text-center bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition-colors duration-300 transform hover:scale-105">Download Now</a>
                     </div>
-
-                    <!-- Game Card 2 -->
-                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
-                        <img src="https://placehold.co/400x300/e74c3c/ffffff?text=Puzzle+Quest" alt="Game 2" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-white mb-2">Puzzle Quest</h3>
-                            <p class="text-gray-400 text-sm mb-4">Puzzle | Adventure</p>
-                             <div class="flex space-x-4">
-                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
-                                <!-- Example of a disabled download button -->
-                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm opacity-50 cursor-not-allowed">Download</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Game Card 3 -->
-                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
-                        <img src="https://placehold.co/400x300/2ecc71/ffffff?text=Racing+Fury" alt="Game 3" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-white mb-2">Racing Fury 3D</h3>
-                            <p class="text-gray-400 text-sm mb-4">Racing | Sports</p>
-                             <div class="flex space-x-4">
-                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
-                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm">Download</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Game Card 4 -->
-                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
-                        <img src="https://placehold.co/400x300/f1c40f/ffffff?text=Kingdom+Build" alt="Game 4" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-white mb-2">Kingdom Builder</h3>
-                            <p class="text-gray-400 text-sm mb-4">Strategy | Simulation</p>
-                             <div class="flex space-x-4">
-                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
-                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm">Download</a>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </div>
-        </section>
 
-        <!-- Categories Section -->
-        <section class="py-16 sm:py-24">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">
-                    Browse by <span class="text-cyan-400">Category</span>
-                </h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
-                    
-                    <!-- Category Card -->
-                    <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
-                        <span class="text-3xl mb-2">⚔️</span>
-                        <h3 class="font-bold text-white text-lg">Action</h3>
-                    </a>
-                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
-                        <span class="text-3xl mb-2">🗺️</span>
-                        <h3 class="font-bold text-white text-lg">Adventure</h3>
-                    </a>
-                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
-                        <span class="text-3xl mb-2">🧩</span>
-                        <h3 class="font-bold text-white text-lg">Puzzle</h3>
-                    </a>
-                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
-                        <span class="text-3xl mb-2">♟️</span>
-                        <h3 class="font-bold text-white text-lg">Strategy</h3>
-                    </a>
-                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
-                        <span class="text-3xl mb-2">🏎️</span>
-                        <h3 class="font-bold text-white text-lg">Racing</h3>
-                    </a>
+                <!-- Game Card 2 (Download) -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/ed8936/ffffff?text=Open+World+RPG" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Fantasy Realms</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">Embark on an epic open-world RPG adventure, customize your hero, and forge your destiny.</p>
+                        <a href="#" class="block w-full text-center bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition-colors duration-300 transform hover:scale-105">Download Now</a>
+                    </div>
+                </div>
+
+                <!-- Game Card 3 (Download) -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/f6ad55/ffffff?text=Simulation" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">City Builder Sim</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">Design and manage your dream city, from small towns to bustling metropolises.</p>
+                        <a href="#" class="block w-full text-center bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition-colors duration-300 transform hover:scale-105">Download Now</a>
+                    </div>
+                </div>
+
+                <!-- Game Card 4 (Download) -->
+                <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                    <img src="https://placehold.co/600x400/97266d/ffffff?text=Indie+Gem" alt="Game Thumbnail" class="w-full h-48 object-cover rounded-t-xl">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Whispering Woods</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">An atmospheric indie horror game with a deep storyline and chilling encounters.</p>
+                        <a href="#" class="block w-full text-center bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition-colors duration-300 transform hover:scale-105">Download Now</a>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
-    
+
     <!-- Footer -->
-    <footer class="bg-black pt-12 pb-8">
-        <div class="container mx-auto px-6 text-center text-gray-400">
-            <a href="#" class="text-2xl font-black text-white uppercase tracking-widest">
-                Online<span class="text-cyan-400">Games</span>
-            </a>
-            <div class="flex justify-center space-x-6 my-6">
-                <a href="#" class="hover:text-cyan-400 transition-colors">Home</a>
-                <a href="#" class="hover:text-cyan-400 transition-colors">All Games</a>
-                <a href="https://github.com/truetoreview/online-games" target="_blank" class="hover:text-cyan-400 transition-colors">GitHub</a>
-                <a href="#" class="hover:text-cyan-400 transition-colors">Contact</a>
+    <footer class="bg-gray-900 py-8 px-4 md:px-12 text-center text-gray-400 rounded-t-xl">
+        <div class="container mx-auto">
+            <p>&copy; 2025 Online Games. All rights reserved. <a href="https://truetoreview.github.io/onlinegames" class="text-gray-500 hover:text-white transition-colors duration-300">truetoreview.github.io/onlinegames</a></p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="hover:text-white transition-colors duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors duration-300">Terms of Service</a>
             </div>
-            <p class="text-sm">&copy; 2024 Online Games. All rights reserved.</p>
-            <p class="text-xs mt-2">A project by <a href="https://github.com/truetoreview" target="_blank" class="text-cyan-500 hover:underline">truetoreview</a></p>
         </div>
     </footer>
 
-    <!-- JavaScript for Mobile Menu -->
     <script>
+        // Toggle mobile menu visibility
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
 
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
-    </script>
 
+        // Close mobile menu when a link is clicked
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
 </body>
-              </html>
-  
+</html>
