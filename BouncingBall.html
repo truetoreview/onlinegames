@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Ball Game</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Darker background for game */
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars if canvas overflows temporarily */
+        }
+        canvas {
+            background-color: #1a202c; /* Canvas background */
+            border: 4px solid #4a5568; /* Border around canvas */
+            display: block;
+            touch-action: none; /* Disable default touch actions */
+            border-radius: 12px; /* Rounded corners for the canvas */
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4); /* Neon-like glow */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="p-4 md:p-8 flex flex-col items-center justify-center w-full max-w-4xl">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-8 text-cyan-400 text-center">Bouncing Ball</h1>
+
+        <!-- Canvas for the game -->
+        <canvas id="bouncingBallCanvas" class="w-full h-[60vh] sm:h-[70vh] lg:h-[80vh]"></canvas>
+
+        <!-- Back to Home Button -->
+        <a href="index.html" class="mt-8 bg-purple-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105">
+            Back to Home
+        </a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bouncingBallCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ball properties
+        let ballRadius = 20;
+        let x = canvas.width / 2; // Initial x position (will be updated on resize)
+        let y = canvas.height - ballRadius; // Initial y position (will be updated on resize)
+        let dx = 5; // X velocity
+        let dy = -5; // Y velocity
+        let ballColor = '#FF00FF'; // Magenta color
+
+        // Function to draw the ball
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = ballColor;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Function to update game state
+        function update() {
+            // Move the ball
+            x += dx;
+            y += dy;
+
+            // Wall collision detection
+            if (x + ballRadius > canvas.width || x - ballRadius < 0) {
+                dx = -dx; // Reverse x direction
+                // Adjust position if it went past the boundary
+                if (x + ballRadius > canvas.width) x = canvas.width - ballRadius;
+                if (x - ballRadius < 0) x = ballRadius;
+            }
+            if (y + ballRadius > canvas.height || y - ballRadius < 0) {
+                dy = -dy; // Reverse y direction
+                // Adjust position if it went past the boundary
+                if (y + ballRadius > canvas.height) y = canvas.height - ballRadius;
+                if (y - ballRadius < 0) y = ballRadius;
+            }
+        }
+
+        // Function to draw everything on the canvas
+        function draw() {
+            // Clear the canvas for the new frame
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw a background color (optional, canvas background is already set by CSS)
+            // ctx.fillStyle = '#1a202c';
+            // ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawBall();
+            update();
+            requestAnimationFrame(draw); // Loop the animation
+        }
+
+        // Handle canvas resizing for responsiveness
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            // Set a responsive height relative to viewport height, adjusted for aspect ratio if needed
+            // For this simple game, we'll let CSS handle the height for now to ensure it fits the overall layout
+            canvas.height = canvas.offsetHeight; // Use actual rendered height from CSS
+
+            // Reset ball position on resize to avoid it being out of bounds
+            x = Math.max(ballRadius, Math.min(x, canvas.width - ballRadius));
+            y = Math.max(ballRadius, Math.min(y, canvas.height - ballRadius));
+        }
+
+        // Event listeners for resizing
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup when the window loads
+        window.onload = function () {
+            resizeCanvas(); // Set initial canvas size
+            draw(); // Start the game loop
+        };
+    </script>
+</body>
+</html>
