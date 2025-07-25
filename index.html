@@ -1,180 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Left vs. Right Shooter</title>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #222;
-    }
-    canvas {
-      border: 2px solid #555;
-      background: #111;
-      display: block;
-    }
-    #gameOver {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #fff;
-      font-size: 36px;
-      text-align: center;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Games - Play Free Games Online</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212; /* A very dark gray, almost black */
+            color: #E0E0E0; /* Light gray for text */
+        }
+        .hero-section {
+            background-image: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 1)), url('https://placehold.co/1920x1080/1a202c/ffffff?text=Epic+Game+Montage');
+            background-size: cover;
+            background-position: center;
+        }
+        .game-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #1E1E1E;
+        }
+        .game-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.15);
+        }
+        .btn-primary {
+            background-color: #00FFFF; /* Cyan */
+            color: #121212;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #00CCCC;
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid #00FFFF;
+            color: #00FFFF;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #00FFFF;
+            color: #121212;
+        }
+        .category-card {
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            border-color: #333;
+        }
+        .category-card:hover {
+             transform: scale(1.05);
+             border-color: #00FFFF;
+        }
+    </style>
 </head>
-<body>
-  <canvas id="gameCanvas" width="800" height="400"></canvas>
-  <div id="gameOver"></div>
+<body class="antialiased">
 
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const GAME_OVER_DIV = document.getElementById('gameOver');
+    <!-- Header -->
+    <header class="bg-black/80 backdrop-blur-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Site Title/Logo -->
+            <a href="#" class="text-2xl font-black text-white uppercase tracking-widest">
+                Online<span class="text-cyan-400">Games</span>
+            </a>
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">Home</a>
+                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">All Games</a>
+                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">Categories</a>
+                <a href="#" class="text-gray-300 hover:text-cyan-400 transition-colors">About</a>
+            </div>
+            <!-- CTA Button -->
+            <a href="https://github.com/truetoreview/online-games" target="_blank" class="hidden md:block bg-gray-700 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                GitHub
+            </a>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4">
+            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">Home</a>
+            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">All Games</a>
+            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">Categories</a>
+            <a href="#" class="block text-gray-300 hover:text-cyan-400 py-2">About</a>
+            <a href="https://github.com/truetoreview/online-games" target="_blank" class="block bg-gray-700 text-white mt-2 py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors text-center">
+                GitHub
+            </a>
+        </div>
+    </header>
 
-    // Keyboard input
-    const keys = { left: false, right: false, up: false, down: false, space: false };
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') keys.left = true;
-      if (e.key === 'ArrowRight') keys.right = true;
-      if (e.key === ' ') keys.space = true;
-    });
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'ArrowLeft') keys.left = false;
-      if (e.key === 'ArrowRight') keys.right = false;
-      if (e.key === ' ') keys.space = false;
-    });
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section h-[70vh] md:h-[80vh] flex items-center justify-center text-center">
+            <div class="container mx-auto px-6">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white uppercase drop-shadow-lg">
+                    Your Ultimate Gaming Hub
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-3xl mx-auto drop-shadow-md">
+                    Discover and play thousands of free online games. No downloads, just instant fun.
+                </p>
+                <div class="mt-8">
+                    <a href="#featured-games" class="btn-primary py-3 px-8 rounded-full text-lg uppercase">
+                        Play Now
+                    </a>
+                </div>
+            </div>
+        </section>
 
-    class Shooter {
-      constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.width = 40;
-        this.height = 40;
-        this.color = color;
-        this.maxHealth = 10;
-        this.health = this.maxHealth;
-        this.cooldown = 0;
-      }
-      draw() {
-        // Body
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        // Health bar
-        const barWidth = 50;
-        const barHeight = 6;
-        const barX = this.x + (this.width - barWidth) / 2;
-        const barY = this.y - barHeight - 4;
-        ctx.fillStyle = '#555';
-        ctx.fillRect(barX, barY, barWidth, barHeight);
-        ctx.fillStyle = '#0f0';
-        ctx.fillRect(barX, barY, barWidth * (this.health / this.maxHealth), barHeight);
-        ctx.strokeStyle = '#000';
-        ctx.strokeRect(barX, barY, barWidth, barHeight);
-      }
-      update() {
-        if (this.cooldown > 0) this.cooldown--;
-      }
-      shoot(targetX, targetY) {
-        if (this.cooldown > 0 || this.health <= 0) return;
-        const angle = Math.atan2(targetY - (this.y + this.height/2), targetX - (this.x + this.width/2));
-        bullets.push(new Bullet(this.x + this.width/2, this.y + this.height/2, angle, this));
-        this.cooldown = 30; // frames
-      }
-    }
+        <!-- Featured Games Section -->
+        <section id="featured-games" class="py-16 sm:py-24 bg-[#181818]">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">
+                    <span class="text-cyan-400">Featured</span> Games
+                </h2>
+                <!-- Games Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    
+                    <!-- Game Card 1 -->
+                    <!-- To add your game, change the image src and the links -->
+                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://placehold.co/400x300/3498db/ffffff?text=Space+Shooter" alt="Game 1" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Space Shooter X</h3>
+                            <p class="text-gray-400 text-sm mb-4">Action | Sci-Fi</p>
+                            <div class="flex space-x-4">
+                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
+                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm">Download</a>
+                            </div>
+                        </div>
+                    </div>
 
-    class Bullet {
-      constructor(x, y, angle, parent) {
-        this.x = x;
-        this.y = y;
-        this.vx = Math.cos(angle) * 6;
-        this.vy = Math.sin(angle) * 6;
-        this.size = 8;
-        this.parent = parent;
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-      }
-      draw() {
-        ctx.fillStyle = '#ff0';
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-      }
-      isOffscreen() {
-        return (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height);
-      }
-    }
+                    <!-- Game Card 2 -->
+                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://placehold.co/400x300/e74c3c/ffffff?text=Puzzle+Quest" alt="Game 2" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Puzzle Quest</h3>
+                            <p class="text-gray-400 text-sm mb-4">Puzzle | Adventure</p>
+                             <div class="flex space-x-4">
+                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
+                                <!-- Example of a disabled download button -->
+                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm opacity-50 cursor-not-allowed">Download</a>
+                            </div>
+                        </div>
+                    </div>
 
-    const player = new Shooter(50, canvas.height/2 - 20, '#09f');
-    const enemy = new Shooter(canvas.width - 90, canvas.height/2 - 20, '#f30');
-    const bullets = [];
+                    <!-- Game Card 3 -->
+                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://placehold.co/400x300/2ecc71/ffffff?text=Racing+Fury" alt="Game 3" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Racing Fury 3D</h3>
+                            <p class="text-gray-400 text-sm mb-4">Racing | Sports</p>
+                             <div class="flex space-x-4">
+                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
+                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm">Download</a>
+                            </div>
+                        </div>
+                    </div>
 
-    let gameOver = false;
+                    <!-- Game Card 4 -->
+                    <div class="game-card rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://placehold.co/400x300/f1c40f/ffffff?text=Kingdom+Build" alt="Game 4" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">Kingdom Builder</h3>
+                            <p class="text-gray-400 text-sm mb-4">Strategy | Simulation</p>
+                             <div class="flex space-x-4">
+                                <a href="#" class="flex-1 text-center btn-primary py-2 px-4 rounded-lg text-sm">Play Online</a>
+                                <a href="#" class="flex-1 text-center btn-secondary py-2 px-4 rounded-lg text-sm">Download</a>
+                            </div>
+                        </div>
+                    </div>
 
-    function update() {
-      if (gameOver) return;
+                </div>
+            </div>
+        </section>
 
-      // Player movement
-      if (keys.left && player.x > 0) player.x -= 4;
-      if (keys.right && player.x < canvas.width/2 - player.width) player.x += 4;
-      if (keys.space) player.shoot(enemy.x, enemy.y + enemy.height/2);
+        <!-- Categories Section -->
+        <section class="py-16 sm:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">
+                    Browse by <span class="text-cyan-400">Category</span>
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
+                    
+                    <!-- Category Card -->
+                    <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
+                        <span class="text-3xl mb-2">⚔️</span>
+                        <h3 class="font-bold text-white text-lg">Action</h3>
+                    </a>
+                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
+                        <span class="text-3xl mb-2">🗺️</span>
+                        <h3 class="font-bold text-white text-lg">Adventure</h3>
+                    </a>
+                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
+                        <span class="text-3xl mb-2">🧩</span>
+                        <h3 class="font-bold text-white text-lg">Puzzle</h3>
+                    </a>
+                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
+                        <span class="text-3xl mb-2">♟️</span>
+                        <h3 class="font-bold text-white text-lg">Strategy</h3>
+                    </a>
+                     <a href="#" class="category-card bg-[#1E1E1E] p-8 rounded-lg border-2 flex flex-col items-center justify-center">
+                        <span class="text-3xl mb-2">🏎️</span>
+                        <h3 class="font-bold text-white text-lg">Racing</h3>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-black pt-12 pb-8">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <a href="#" class="text-2xl font-black text-white uppercase tracking-widest">
+                Online<span class="text-cyan-400">Games</span>
+            </a>
+            <div class="flex justify-center space-x-6 my-6">
+                <a href="#" class="hover:text-cyan-400 transition-colors">Home</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors">All Games</a>
+                <a href="https://github.com/truetoreview/online-games" target="_blank" class="hover:text-cyan-400 transition-colors">GitHub</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors">Contact</a>
+            </div>
+            <p class="text-sm">&copy; 2024 Online Games. All rights reserved.</p>
+            <p class="text-xs mt-2">A project by <a href="https://github.com/truetoreview" target="_blank" class="text-cyan-500 hover:underline">truetoreview</a></p>
+        </div>
+    </footer>
 
-      // Enemy AI: simple cooldown-based shooting at player
-      if (enemy.cooldown <= 0) {
-        enemy.shoot(player.x, player.y + player.height/2);
-      }
+    <!-- JavaScript for Mobile Menu -->
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-      player.update();
-      enemy.update();
-
-      // Update bullets
-      bullets.forEach((b, i) => {
-        b.update();
-        // Check collision with target (not parent)
-        const targets = [player, enemy].filter(t => t !== b.parent);
-        targets.forEach(t => {
-          if (b.x < t.x + t.width && b.x + b.size > t.x && b.y < t.y + t.height && b.y + b.size > t.y) {
-            // hit
-            t.health--;
-            bullets.splice(i, 1);
-          }
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
-        if (b.isOffscreen()) bullets.splice(i, 1);
-      });
+    </script>
 
-      // Check game over
-      if (player.health <= 0 || enemy.health <= 0) {
-        gameOver = true;
-        showGameOver(player.health > 0 ? 'You Win!' : 'You Lose!');
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      player.draw();
-      enemy.draw();
-      bullets.forEach(b => b.draw());
-    }
-
-    function loop() {
-      update();
-      draw();
-      if (!gameOver) requestAnimationFrame(loop);
-    }
-
-    function showGameOver(text) {
-      GAME_OVER_DIV.textContent = text;
-      GAME_OVER_DIV.style.display = 'block';
-    }
-
-    loop();
-  </script>
 </body>
-</html>
+              </html>
+  
